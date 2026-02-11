@@ -61,6 +61,12 @@ export default function MonthCalendar({ habits, checks, onToggleCheck }) {
     setCurrentDate(addMonths(currentDate, 1));
   };
 
+  // 습관 점 클릭 핸들러
+  const handleHabitClick = (e, habitId, dateStr) => {
+    e.stopPropagation(); // 이벤트 버블링 방지
+    onToggleCheck(habitId, dateStr);
+  };
+
   return (
     <div className='month-calendar'>
       {/* 월 네비게이션 */}
@@ -109,14 +115,20 @@ export default function MonthCalendar({ habits, checks, onToggleCheck }) {
                 {habits.map((habit) => {
                   const isChecked = checks[habit.id]?.[dateStr] === true;
                   return (
-                    <div
+                    <button
                       key={habit.id}
-                      className={`habit-dot ${isChecked ? 'checked' : ''}`}
+                      className={`habit-dot ${
+                        isChecked ? 'checked' : 'unchecked'
+                      }`}
                       style={{
                         backgroundColor: isChecked ? habit.color : '#e5e7eb',
+                        borderColor: habit.color,
                       }}
-                      onClick={() => onToggleCheck(habit.id, dateStr)}
-                      title={habit.name}
+                      onClick={(e) => handleHabitClick(e, habit.id, dateStr)}
+                      title={`${habit.icon} ${habit.name}`}
+                      aria-label={`${habit.name} ${
+                        isChecked ? '완료됨' : '미완료'
+                      }`}
                     />
                   );
                 })}

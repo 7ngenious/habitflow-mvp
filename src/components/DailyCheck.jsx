@@ -67,25 +67,37 @@ export default function DailyCheck({ habits, checks, onToggleCheck }) {
           const isChecked = checks[habit.id]?.[today] === true;
 
           return (
-            <div
-              key={habit.id}
-              className={`habit-check-item ${isChecked ? 'checked' : ''}`}
-              onClick={() => onToggleCheck(habit.id, today)}
-            >
+            <label key={habit.id} className='habit-check-item'>
               <div className='habit-check-content'>
                 <span className='habit-icon'>{habit.icon}</span>
                 <span className='habit-name'>{habit.name}</span>
               </div>
+              <input
+                type='checkbox'
+                className='habit-checkbox-input'
+                checked={isChecked}
+                onChange={() => onToggleCheck(habit.id, today)}
+              />
               <div
-                className='checkbox'
+                className='habit-checkbox-custom'
                 style={{
                   borderColor: habit.color,
                   backgroundColor: isChecked ? habit.color : 'transparent',
                 }}
               >
-                {isChecked && <span className='checkmark'>✓</span>}
+                {isChecked && (
+                  <svg
+                    className='checkmark-icon'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    stroke='white'
+                    strokeWidth='3'
+                  >
+                    <polyline points='20 6 9 17 4 12'></polyline>
+                  </svg>
+                )}
               </div>
-            </div>
+            </label>
           );
         })}
       </div>

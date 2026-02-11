@@ -6,12 +6,12 @@ export default function LanguageSwitcher() {
 
   return (
     <button
-      className='language-switcher'
+      className='language-switcher-flag'
       onClick={toggleLanguage}
       title={language === 'ko' ? '日本語に切り替え' : '한국어로 전환'}
       aria-label={language === 'ko' ? '일본어로 전환' : '한국어로 전환'}
     >
-      {language === 'ko' ? '🇯🇵' : '🇰🇷'}
+      <span className='flag-emoji'>{language === 'ko' ? '🇯🇵' : '🇰🇷'}</span>
     </button>
   );
 }
