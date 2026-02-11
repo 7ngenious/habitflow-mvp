@@ -1,20 +1,40 @@
 import { format } from 'date-fns';
-import { ko } from 'date-fns/locale';
-import { getTodayString } from '../utils/dateUtils';
+import { ko as koLocale, ja as jaLocale } from 'date-fns/locale';
+import { formatDate } from '../utils/dateUtils';
+import { useLanguage } from '../contexts/Languagecontext';
 
 export default function DailyCheck({ habits, checks, onToggleCheck }) {
-  const today = getTodayString();
-  const todayDate = new Date();
-  const formattedDate = format(todayDate, 'yyyy년 M월 d일 EEEE', {
-    locale: ko,
-  });
+  const { t, language } = useLanguage();
 
-  // 오늘의 완료율 계산
+  const today = formatDate(new Date());
+  const todayDate = new Date();
+
+  // 날짜 포맷 (언어별)
+  const dateLocale = language === 'ko' ? koLocale : jaLocale;
+  const dateFormat =
+    language === 'ko' ? 'yyyy년 M월 d일 EEEE' : 'yyyy年M月d日 EEEE';
+  const formattedDate = format(todayDate, dateFormat, { locale: dateLocale });
+
+  // 오늘의 완료 현황
   const completedCount = habits.filter(
     (habit) => checks[habit.id]?.[today] === true
   ).length;
+
   const completionRate =
     habits.length > 0 ? Math.round((completedCount / habits.length) * 100) : 0;
+
+  const allCompleted = habits.length > 0 && completedCount === habits.length;
+
+  if (habits.length === 0) {
+    return (
+      <div className='daily-check'>
+        <div className='empty-state'>
+          <p>{t.dailyCheck.emptyState.line1}</p>
+          <p>{t.dailyCheck.emptyState.line2}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='daily-check'>
@@ -22,11 +42,11 @@ export default function DailyCheck({ habits, checks, onToggleCheck }) {
         <h2>{formattedDate}</h2>
         <div className='completion-badge'>
           <span className='completion-rate'>{completionRate}%</span>
-          <span className='completion-text'>완료</span>
+          <span className='completion-text'>{t.dailyCheck.completion}</span>
         </div>
       </div>
 
-      <div className='daily-progress'>
+      <div className='progress-section'>
         <div className='progress-bar'>
           <div
             className='progress-fill'
@@ -34,50 +54,41 @@ export default function DailyCheck({ habits, checks, onToggleCheck }) {
           />
         </div>
         <p className='progress-text'>
-          {completedCount} / {habits.length} 습관 완료
+          {completedCount} / {habits.length} {t.dailyCheck.progressText}
         </p>
       </div>
 
-      <div className='habit-checks'>
-        {habits.length === 0 ? (
-          <div className='empty-state'>
-            <p>체크할 습관이 없습니다.</p>
-            <p>먼저 습관을 추가해주세요!</p>
-          </div>
-        ) : (
-          habits.map((habit) => {
-            const isChecked = checks[habit.id]?.[today] === true;
-
-            return (
-              <div
-                key={habit.id}
-                className={`check-item ${isChecked ? 'checked' : ''}`}
-                onClick={() => onToggleCheck(habit.id, today)}
-              >
-                <div className='check-box'>
-                  {isChecked && (
-                    <svg viewBox='0 0 24 24' fill='none' stroke='currentColor'>
-                      <polyline points='20 6 9 17 4 12'></polyline>
-                    </svg>
-                  )}
-                </div>
-                <div className='check-info'>
-                  <span className='check-icon' style={{ color: habit.color }}>
-                    {habit.icon}
-                  </span>
-                  <span className='check-name'>{habit.name}</span>
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
-
-      {completedCount === habits.length && habits.length > 0 && (
-        <div className='celebration'>
-          <p>🎉 오늘의 모든 습관을 완료했어요!</p>
-        </div>
+      {allCompleted && (
+        <div className='celebration-message'>{t.dailyCheck.celebration}</div>
       )}
+
+      <div className='habits-checklist'>
+        {habits.map((habit) => {
+          const isChecked = checks[habit.id]?.[today] === true;
+
+          return (
+            <div
+              key={habit.id}
+              className={`habit-check-item ${isChecked ? 'checked' : ''}`}
+              onClick={() => onToggleCheck(habit.id, today)}
+            >
+              <div className='habit-check-content'>
+                <span className='habit-icon'>{habit.icon}</span>
+                <span className='habit-name'>{habit.name}</span>
+              </div>
+              <div
+                className='checkbox'
+                style={{
+                  borderColor: habit.color,
+                  backgroundColor: isChecked ? habit.color : 'transparent',
+                }}
+              >
+                {isChecked && <span className='checkmark'>✓</span>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

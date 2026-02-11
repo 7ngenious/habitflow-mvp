@@ -1,25 +1,38 @@
 import { useState } from 'react';
 import { format, addMonths, subMonths } from 'date-fns';
-import { ko } from 'date-fns/locale';
+import { ko as koLocale, ja as jaLocale } from 'date-fns/locale';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import {
   getCalendarDays,
   formatDate,
-  getWeekOfMonth,
+  getWeeksInMonth,
 } from '../utils/dateUtils';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { useLanguage } from '../contexts/Languagecontext';
 
 export default function MonthCalendar({ habits, checks, onToggleCheck }) {
+  const { t, language } = useLanguage();
   const [currentDate, setCurrentDate] = useState(new Date());
+
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth() + 1;
 
-  const calendarDays = getCalendarDays(year, month);
-  const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+  // 언어별 날짜 포맷
+  const dateLocale = language === 'ko' ? koLocale : jaLocale;
+  const monthFormat = language === 'ko' ? 'yyyy년 M월' : 'yyyy年M月';
+  const formattedMonth = format(currentDate, monthFormat, {
+    locale: dateLocale,
+  });
 
-  // 특정 날짜의 완료율 계산
-  const getCompletionRate = (date) => {
-    if (!date) return 0;
-    const dateStr = formatDate(date);
+  const calendarDays = getCalendarDays(year, month);
+  const weeks = getWeeksInMonth(year, month);
+  const weekdays = t.calendar.weekdays;
+
+  const today = formatDate(new Date());
+
+  // 날짜별 완료율 계산
+  const getCompletionRate = (day) => {
+    if (!day) return 0;
+    const dateStr = formatDate(day);
     const completedCount = habits.filter(
       (habit) => checks[habit.id]?.[dateStr] === true
     ).length;
@@ -28,57 +41,43 @@ export default function MonthCalendar({ habits, checks, onToggleCheck }) {
       : 0;
   };
 
-  // 주별 완료율 계산
-  const getWeeklyStats = () => {
-    const weekStats = {};
-    calendarDays.forEach((day) => {
-      if (day) {
-        const weekNum = getWeekOfMonth(day);
-        if (!weekStats[weekNum]) {
-          weekStats[weekNum] = { total: 0, sum: 0 };
-        }
-        weekStats[weekNum].total += 1;
-        weekStats[weekNum].sum += getCompletionRate(day);
-      }
-    });
+  // 주차별 평균 완료율
+  const getWeekAverage = (weekDays) => {
+    const validDays = weekDays.filter((day) => day !== null);
+    if (validDays.length === 0) return 0;
 
-    return Object.entries(weekStats).map(([week, stats]) => ({
-      week: parseInt(week),
-      rate: Math.round(stats.sum / stats.total),
-    }));
+    const totalRate = validDays.reduce((sum, day) => {
+      return sum + getCompletionRate(day);
+    }, 0);
+
+    return Math.round(totalRate / validDays.length);
   };
 
-  const weeklyStats = getWeeklyStats();
+  const handlePrevMonth = () => {
+    setCurrentDate(subMonths(currentDate, 1));
+  };
 
-  const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
-  const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
+  const handleNextMonth = () => {
+    setCurrentDate(addMonths(currentDate, 1));
+  };
 
   return (
     <div className='month-calendar'>
+      {/* 월 네비게이션 */}
       <div className='calendar-header'>
-        <button onClick={handlePrevMonth} className='btn-nav'>
+        <button className='nav-button' onClick={handlePrevMonth}>
           <FaChevronLeft />
         </button>
-        <h2>{format(currentDate, 'yyyy년 M월', { locale: ko })}</h2>
-        <button onClick={handleNextMonth} className='btn-nav'>
+        <h2>{formattedMonth}</h2>
+        <button className='nav-button' onClick={handleNextMonth}>
           <FaChevronRight />
         </button>
       </div>
 
-      {/* 주별 통계 */}
-      <div className='weekly-stats'>
-        {weeklyStats.map(({ week, rate }) => (
-          <div key={week} className='week-stat'>
-            <span className='week-label'>Week {week}</span>
-            <span className='week-rate'>{rate}%</span>
-          </div>
-        ))}
-      </div>
-
       {/* 요일 헤더 */}
       <div className='calendar-weekdays'>
-        {weekdays.map((day) => (
-          <div key={day} className='weekday-header'>
+        {weekdays.map((day, index) => (
+          <div key={index} className='weekday-header'>
             {day}
           </div>
         ))}
@@ -95,7 +94,7 @@ export default function MonthCalendar({ habits, checks, onToggleCheck }) {
 
           const dateStr = formatDate(day);
           const completionRate = getCompletionRate(day);
-          const isToday = dateStr === formatDate(new Date());
+          const isToday = dateStr === today;
 
           return (
             <div
@@ -106,29 +105,19 @@ export default function MonthCalendar({ habits, checks, onToggleCheck }) {
                 <span className='day-number'>{format(day, 'd')}</span>
                 <span className='day-rate'>{completionRate}%</span>
               </div>
-
               <div className='day-habits'>
                 {habits.map((habit) => {
                   const isChecked = checks[habit.id]?.[dateStr] === true;
                   return (
                     <div
                       key={habit.id}
-                      className={`habit-check ${isChecked ? 'checked' : ''}`}
-                      onClick={() => onToggleCheck(habit.id, dateStr)}
+                      className={`habit-dot ${isChecked ? 'checked' : ''}`}
                       style={{
-                        borderColor: habit.color,
-                        backgroundColor: isChecked
-                          ? habit.color
-                          : 'transparent',
+                        backgroundColor: isChecked ? habit.color : '#e5e7eb',
                       }}
+                      onClick={() => onToggleCheck(habit.id, dateStr)}
                       title={habit.name}
-                    >
-                      {isChecked && (
-                        <svg viewBox='0 0 24 24' fill='none' stroke='white'>
-                          <polyline points='20 6 9 17 4 12'></polyline>
-                        </svg>
-                      )}
-                    </div>
+                    />
                   );
                 })}
               </div>
@@ -137,17 +126,35 @@ export default function MonthCalendar({ habits, checks, onToggleCheck }) {
         })}
       </div>
 
+      {/* 주차별 통계 */}
+      <div className='week-stats'>
+        {weeks.map((weekDays, weekIndex) => (
+          <div key={weekIndex} className='week-stat'>
+            <span className='week-label'>
+              {t.calendar.weekLabel} {weekIndex + 1}
+            </span>
+            <div className='week-progress'>
+              <div
+                className='week-progress-fill'
+                style={{ width: `${getWeekAverage(weekDays)}%` }}
+              />
+            </div>
+            <span className='week-rate'>{getWeekAverage(weekDays)}%</span>
+          </div>
+        ))}
+      </div>
+
       {/* 습관 범례 */}
       <div className='calendar-legend'>
-        <h3>습관 목록</h3>
+        <h3>{t.calendar.legendTitle}</h3>
         <div className='legend-items'>
           {habits.map((habit) => (
             <div key={habit.id} className='legend-item'>
-              <div
+              <span className='legend-icon'>{habit.icon}</span>
+              <span
                 className='legend-color'
                 style={{ backgroundColor: habit.color }}
               />
-              <span className='legend-icon'>{habit.icon}</span>
               <span className='legend-name'>{habit.name}</span>
             </div>
           ))}

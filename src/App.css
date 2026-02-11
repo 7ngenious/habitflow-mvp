@@ -870,3 +870,544 @@ body {
     height: 12px;
   }
 }
+/* ===== 오늘 탭 - 체크리스트 스타일 수정 ===== */
+
+.daily-check {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.habits-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.habit-check-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: white;
+  border-radius: 12px;
+  border: 2px solid var(--gray-200);
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 60px;
+}
+
+.habit-check-item:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.habit-check-item.checked {
+  background: var(--gray-50);
+  border-color: var(--success-color);
+}
+
+.habit-check-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0; /* 텍스트 overflow 방지 */
+}
+
+.habit-check-content .habit-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.habit-check-content .habit-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--gray-800);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.checkbox {
+  width: 28px;
+  height: 28px;
+  min-width: 28px; /* 고정 크기 */
+  min-height: 28px;
+  border: 2px solid var(--gray-300);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.habit-check-item.checked .checkbox {
+  border-color: var(--success-color);
+}
+
+.checkmark {
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .habit-check-item {
+    padding: 14px 16px;
+    min-height: 56px;
+  }
+
+  .habit-check-content .habit-icon {
+    font-size: 1.3rem;
+  }
+
+  .habit-check-content .habit-name {
+    font-size: 0.95rem;
+  }
+
+  .checkbox {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    min-height: 26px;
+  }
+} /* ===== 언어 전환 버튼 스타일 (국기만) ===== */
+
+.language-switcher {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: white;
+  border: 2px solid var(--gray-200);
+  border-radius: 50%; /* 동그랗게 */
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 1.5rem;
+  box-shadow: var(--shadow);
+  padding: 0;
+}
+
+.language-switcher:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: var(--shadow-lg);
+}
+
+.language-switcher:active {
+  transform: translateY(0) scale(1);
+}
+
+/* 헤더 레이아웃 */
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 20px;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .header-content {
+    gap: 12px;
+  }
+
+  .language-switcher {
+    width: 44px;
+    height: 44px;
+    font-size: 1.3rem;
+  }
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.language-switcher {
+  animation: fadeIn 0.3s ease-out;
+}
+/* ========================================
+   오늘 탭 - 체크박스 스타일 (완전 수정)
+   ======================================== */
+
+.daily-check {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.habits-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.habit-check-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: white;
+  border-radius: 12px;
+  border: 2px solid var(--gray-200);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.habit-check-item:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.habit-check-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  pointer-events: none;
+}
+
+.habit-check-content .habit-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.habit-check-content .habit-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--gray-800);
+}
+
+/* 실제 체크박스 숨기기 */
+.habit-checkbox-input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 0;
+  height: 0;
+}
+
+/* 커스텀 체크박스 */
+.habit-checkbox-custom {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  border: 2.5px solid var(--gray-300);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.habit-check-item:hover .habit-checkbox-custom {
+  border-width: 3px;
+}
+
+/* 체크마크 아이콘 */
+.checkmark-icon {
+  width: 18px;
+  height: 18px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ========================================
+     언어 전환 버튼 (국기로 가득 찬 원형)
+     ======================================== */
+
+.language-switcher-flag {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--gray-300);
+  background: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.language-switcher-flag:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: var(--primary-color);
+}
+
+.language-switcher-flag:active {
+  transform: scale(0.95);
+}
+
+.flag-emoji {
+  font-size: 2rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* 헤더 레이아웃 */
+.app-header .header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.app-header .header-content > div:first-child {
+  flex: 1;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .habit-check-item {
+    padding: 14px 16px;
+  }
+
+  .habit-check-content .habit-icon {
+    font-size: 1.3rem;
+  }
+
+  .habit-check-content .habit-name {
+    font-size: 0.95rem;
+  }
+
+  .habit-checkbox-custom {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    min-height: 26px;
+  }
+
+  .checkmark-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .language-switcher-flag {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .flag-emoji {
+    font-size: 1.8rem;
+  }
+}
+
+/* 애니메이션 */
+@keyframes checkPop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.habit-checkbox-input:checked ~ .habit-checkbox-custom .checkmark-icon {
+  animation: checkPop 0.3s ease-out;
+}
+
+@keyframes flagSpin {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+  to {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+.language-switcher-flag:active .flag-emoji {
+  animation: flagSpin 0.5s ease-in-out;
+}
+/* ========================================
+   캘린더 - 습관 점 클릭 가능하게 수정
+   ======================================== */
+
+.calendar-day {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 8px;
+  min-height: 100px;
+  transition: all 0.2s;
+}
+
+.calendar-day:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.calendar-day.today {
+  border-color: var(--primary-color);
+  border-width: 2px;
+  background: linear-gradient(135deg, #f0f9ff 0%, white 100%);
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.day-number {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--gray-700);
+}
+
+.day-rate {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  font-weight: 500;
+}
+
+/* 습관 점들 */
+.day-habits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 0;
+  min-height: 30px;
+}
+
+.habit-dot {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  min-height: 16px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.habit-dot:hover {
+  transform: scale(1.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.habit-dot:active {
+  transform: scale(1.2);
+}
+
+.habit-dot.checked {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  border-width: 0;
+}
+
+.habit-dot.unchecked {
+  border-width: 2px;
+  background: white !important;
+  opacity: 0.6;
+}
+
+.habit-dot.unchecked:hover {
+  opacity: 1;
+}
+
+/* 반응형 - 모바일 */
+@media (max-width: 768px) {
+  .calendar-day {
+    min-height: 80px;
+    padding: 6px;
+  }
+
+  .day-header {
+    margin-bottom: 6px;
+  }
+
+  .day-number {
+    font-size: 0.85rem;
+  }
+
+  .day-rate {
+    font-size: 0.7rem;
+  }
+
+  .day-habits {
+    gap: 4px;
+    min-height: 24px;
+  }
+
+  .habit-dot {
+    width: 14px;
+    height: 14px;
+    min-width: 14px;
+    min-height: 14px;
+  }
+
+  .habit-dot:hover {
+    transform: scale(1.6);
+  }
+}
+
+/* 빈 날짜 */
+.calendar-day.empty {
+  background: var(--gray-50);
+  border-color: transparent;
+  min-height: 80px;
+}
+
+/* 애니메이션 */
+@keyframes dotPop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.habit-dot:active {
+  animation: dotPop 0.3s ease-out;
+}

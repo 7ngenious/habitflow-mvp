@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FaPlus, FaTrash } from 'react-icons/fa';
+import { useLanguage } from '../contexts/Languagecontext';
 
 const PRESET_COLORS = [
   '#EF4444',
@@ -24,6 +25,7 @@ const PRESET_ICONS = [
 ];
 
 export default function HabitList({ habits, onAddHabit, onDeleteHabit }) {
+  const { t } = useLanguage();
   const [isAdding, setIsAdding] = useState(false);
   const [newHabit, setNewHabit] = useState({
     name: '',
@@ -47,29 +49,31 @@ export default function HabitList({ habits, onAddHabit, onDeleteHabit }) {
   return (
     <div className='habit-list'>
       <div className='habit-list-header'>
-        <h2>내 습관 ({habits.length})</h2>
+        <h2>
+          {t.habitList.title} ({habits.length})
+        </h2>
         <button className='btn-add' onClick={() => setIsAdding(!isAdding)}>
-          <FaPlus /> 습관 추가
+          <FaPlus /> {t.habitList.addButton}
         </button>
       </div>
 
       {isAdding && (
         <form className='habit-form' onSubmit={handleSubmit}>
           <div className='form-group'>
-            <label>습관 이름</label>
+            <label>{t.habitForm.nameLabel}</label>
             <input
               type='text'
               value={newHabit.name}
               onChange={(e) =>
                 setNewHabit({ ...newHabit, name: e.target.value })
               }
-              placeholder='예: 아침 운동'
+              placeholder={t.habitForm.namePlaceholder}
               autoFocus
             />
           </div>
 
           <div className='form-group'>
-            <label>아이콘</label>
+            <label>{t.habitForm.iconLabel}</label>
             <div className='icon-picker'>
               {PRESET_ICONS.map((icon) => (
                 <button
@@ -87,7 +91,7 @@ export default function HabitList({ habits, onAddHabit, onDeleteHabit }) {
           </div>
 
           <div className='form-group'>
-            <label>색상</label>
+            <label>{t.habitForm.colorLabel}</label>
             <div className='color-picker'>
               {PRESET_COLORS.map((color) => (
                 <button
@@ -105,14 +109,14 @@ export default function HabitList({ habits, onAddHabit, onDeleteHabit }) {
 
           <div className='form-actions'>
             <button type='submit' className='btn-primary'>
-              추가
+              {t.habitForm.submitButton}
             </button>
             <button
               type='button'
               className='btn-secondary'
               onClick={() => setIsAdding(false)}
             >
-              취소
+              {t.habitForm.cancelButton}
             </button>
           </div>
         </form>
@@ -142,8 +146,8 @@ export default function HabitList({ habits, onAddHabit, onDeleteHabit }) {
 
       {habits.length === 0 && !isAdding && (
         <div className='empty-state'>
-          <p>아직 습관이 없습니다.</p>
-          <p>위의 "습관 추가" 버튼을 눌러 시작하세요!</p>
+          <p>{t.habitList.emptyState.line1}</p>
+          <p>{t.habitList.emptyState.line2}</p>
         </div>
       )}
     </div>

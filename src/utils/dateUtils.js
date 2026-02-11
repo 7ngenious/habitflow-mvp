@@ -83,3 +83,37 @@ export function getMonthWeeks(year, month) {
 
   return weeks;
 }
+
+export function getWeeksInMonth(year, month) {
+  const firstDay = startOfMonth(new Date(year, month - 1));
+  const lastDay = endOfMonth(new Date(year, month - 1));
+  const days = eachDayOfInterval({ start: firstDay, end: lastDay });
+  
+  const weeks = [];
+  let currentWeek = [];
+  
+  // 첫 주의 빈 칸
+  const startPadding = getDay(firstDay);
+  for (let i = 0; i < startPadding; i++) {
+    currentWeek.push(null);
+  }
+  
+  // 날짜 추가
+  days.forEach((day) => {
+    currentWeek.push(day);
+    if (currentWeek.length === 7) {
+      weeks.push(currentWeek);
+      currentWeek = [];
+    }
+  });
+  
+  // 마지막 주
+  if (currentWeek.length > 0) {
+    while (currentWeek.length < 7) {
+      currentWeek.push(null);
+    }
+    weeks.push(currentWeek);
+  }
+  
+  return weeks;
+}

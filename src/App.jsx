@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import { useLocalStorage } from './hooks/useLocalStorage';
+import { LanguageProvider, useLanguage } from './contexts/Languagecontext';
 import HabitList from './components/HabitList';
 import DailyCheck from './components/DailyCheck';
 import MonthCalendar from './components/MonthCalendar';
 import ProgressChart from './components/ProgressChart';
-import { FaHome, FaCalendarAlt, FaChartLine, FaCog } from 'react-icons/fa';
+import LanguageSwitcher from './components/Languageswitcher';
+import { FaHome, FaCalendarAlt, FaChartLine } from 'react-icons/fa';
 import './App.css';
 
-function App() {
+function AppContent() {
+  const { t } = useLanguage();
+
   // LocalStorage 상태
   const [habits, setHabits] = useLocalStorage('habits', []);
   const [checks, setChecks] = useLocalStorage('habitChecks', {});
@@ -27,7 +31,7 @@ function App() {
 
   // 습관 삭제
   const handleDeleteHabit = (habitId) => {
-    if (window.confirm('정말 이 습관을 삭제하시겠습니까?')) {
+    if (window.confirm(t.habitList.deleteConfirm)) {
       setHabits(habits.filter((h) => h.id !== habitId));
       // 체크 기록도 삭제
       const newChecks = { ...checks };
@@ -54,17 +58,22 @@ function App() {
 
   // 탭 구성
   const tabs = [
-    { id: 'today', icon: <FaHome />, label: '오늘' },
-    { id: 'calendar', icon: <FaCalendarAlt />, label: '캘린더' },
-    { id: 'stats', icon: <FaChartLine />, label: '통계' },
+    { id: 'today', icon: <FaHome />, label: t.tabs.today },
+    { id: 'calendar', icon: <FaCalendarAlt />, label: t.tabs.calendar },
+    { id: 'stats', icon: <FaChartLine />, label: t.tabs.stats },
   ];
 
   return (
     <div className='app'>
       {/* 헤더 */}
       <header className='app-header'>
-        <h1>HabitFlow</h1>
-        <p className='app-subtitle'>습관을 흐름으로 만들어보세요</p>
+        <div className='header-content'>
+          <div>
+            <h1>{t.header.title}</h1>
+            <p className='app-subtitle'>{t.header.subtitle}</p>
+          </div>
+          <LanguageSwitcher />
+        </div>
       </header>
 
       {/* 습관 관리 섹션 */}
@@ -115,9 +124,17 @@ function App() {
 
       {/* 푸터 */}
       <footer className='app-footer'>
-        <p>Made with ❤️ by 7ngenious</p>
+        <p>{t.footer.madeWith}</p>
       </footer>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
   );
 }
 
